@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snoosic Lyric Studio HD</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+  <!-- PANTALLA 1: BUSCADOR VISUAL -->
+  <div id="screen-search" class="search-screen">
+    <div class="search-header">
+      <h1>Snoosic Search</h1>
+      <p>Busca una canción o artista para generar tu tarjeta de letras</p>
+      
+      <div class="search-bar-container">
+        <input type="text" id="global-search-input" placeholder="Buscar por artista o nombre de la canción" value="">
+        <button id="btn-global-search">Buscar Catálogo</button>
+      </div>
+    </div>
+
+    <div id="search-results-grid" class="results-grid"></div>
+  </div>
+
+  <!-- PANTALLA 2: STUDIO DE EDICIÓN -->
+  <div id="screen-studio" class="studio-layout hidden">
+
+    <!-- SIDEBAR DE CONFIGURACIÓN -->
+    <aside class="sidebar-panel">
+      
+      <section class="panel-section">
+        <button id="btn-back-to-search" class="btn-back">← Volver a Búsqueda</button>
+      </section>
+
+      <!-- 1. Track Seleccionado -->
+      <section class="panel-section">
+        <h3>1. Track Seleccionado</h3>
+        <div class="selected-track-badge">
+          <span id="selected-song-title">Song Name</span>
+          <span id="selected-song-artist" class="subtitle">Artist</span>
+        </div>
+      </section>
+
+      <!-- Texto Superior Quote -->
+      <section class="panel-section">
+        <div class="control-row">
+          <h3>Texto Superior Quote</h3>
+          <input type="checkbox" id="check-show-quote" checked style="width:18px; height:18px; cursor:pointer;">
+        </div>
+        
+        <div class="control-row">
+          <label for="input-quote-prefix">Texto inicio:</label>
+          <input type="text" id="input-quote-prefix" value="Y como dijo " style="background:#09090b; border:1px solid #27272a; color:#fff; padding:6px; border-radius:6px; font-size:0.8rem; flex:1;">
+        </div>
+
+        <div class="control-row">
+          <label for="input-quote-artist">Texto destacado:</label>
+          <input type="text" id="input-quote-artist" value="Enjambre:" style="background:#09090b; border:1px solid #27272a; color:#fff; padding:6px; border-radius:6px; font-size:0.8rem; flex:1;">
+        </div>
+
+        <div class="control-row">
+          <label for="input-quote-highlight-color">Color Destacado:</label>
+          <input type="color" id="input-quote-highlight-color" value="#ff6b00">
+        </div>
+
+        <div class="control-row">
+          <label for="input-quote-pos-x">Posición X (px):</label>
+          <input type="range" id="input-quote-pos-x" min="-400" max="400" step="5" value="0">
+          <span id="val-quote-pos-x" class="val-tag">0px</span>
+        </div>
+
+        <div class="control-row">
+          <label for="input-quote-pos-y">Posición Y (px):</label>
+          <input type="range" id="input-quote-pos-y" min="-800" max="400" step="5" value="-480">
+          <span id="val-quote-pos-y" class="val-tag">-480px</span>
+        </div>
+
+        <div class="control-row">
+          <label for="input-quote-font-size">Tamaño Letra (px):</label>
+          <input type="range" id="input-quote-font-size" min="30" max="120" step="2" value="65">
+          <span id="val-quote-font-size" class="val-tag">65px</span>
+        </div>
+      </section>
+
+      <!-- SECCIÓN TRADUCCIÓN (SOLO APARECE SI NO ES ESPAÑOL) -->
+      <section id="panel-translation" class="panel-section hidden">
+        <div class="control-row">
+          <h3>Traducción al Español</h3>
+          <input type="checkbox" id="check-enable-translation" checked style="width:18px; height:18px; cursor:pointer;">
+        </div>
+        
+        <div class="control-row">
+          <label for="input-subtext-color">Color Texto Original:</label>
+          <input type="color" id="input-subtext-color" value="#94a3b8">
+        </div>
+
+        <div class="control-row">
+          <label for="input-subtext-font-size">Tamaño Texto Original (px):</label>
+          <input type="range" id="input-subtext-font-size" min="14" max="40" step="2" value="22">
+          <span id="val-subtext-font-size" class="val-tag">22px</span>
+        </div>
+      </section>
+
+      <!-- 2. Posición y Canvas -->
+      <section class="panel-section">
+        <h3>2. Posición y Canvas (1080x1920)</h3>
+        
+        <div class="control-row">
+          <label for="input-canvas-bg">Fondo Canvas:</label>
+          <input type="color" id="input-canvas-bg" value="#ffffff">
+        </div>
+
+        <div class="control-row">
+          <label for="input-pos-x">Posición X (px):</label>
+          <input type="range" id="input-pos-x" min="-400" max="400" step="5" value="0">
+          <span id="val-pos-x" class="val-tag">0px</span>
+        </div>
+
+        <div class="control-row">
+          <label for="input-pos-y">Posición Y (px):</label>
+          <input type="range" id="input-pos-y" min="-700" max="700" step="5" value="0">
+          <span id="val-pos-y" class="val-tag">0px</span>
+        </div>
+      </section>
+
+      <!-- 3. Estilo de Tarjeta -->
+      <section class="panel-section">
+        <h3>3. Estilo de Tarjeta</h3>
+        
+        <div class="control-row">
+          <label>Portada Personalizada:</label>
+          <input type="file" id="input-custom-cover" accept="image/*" style="font-size:0.75rem;">
+        </div>
+
+        <div class="control-row">
+          <label for="input-bg-color">Color Tinte Tarjeta:</label>
+          <input type="color" id="input-bg-color" value="#1e3a2b">
+        </div>
+
+        <div class="control-row">
+          <label for="input-card-width">Ancho Tarjeta (px):</label>
+          <input type="range" id="input-card-width" min="300" max="900" step="10" value="700">
+          <span id="val-width" class="val-tag">700px</span>
+        </div>
+
+        <div class="control-row">
+          <label for="input-card-height">Alto Tarjeta (px):</label>
+          <input type="range" id="input-card-height" min="300" max="1200" step="10" value="650">
+          <span id="val-height" class="val-tag">650px</span>
+        </div>
+
+        <div class="control-row">
+          <label for="input-blur-amount">Desenfoque Blur (px):</label>
+          <input type="range" id="input-blur-amount" min="0" max="50" step="1" value="20">
+          <span id="val-blur" class="val-tag">20px</span>
+        </div>
+
+        <div class="control-row">
+          <label for="input-text-color">Color de Letra:</label>
+          <input type="color" id="input-text-color" value="#ffffff">
+        </div>
+
+        <div class="control-row">
+          <label for="input-font-size">Tamaño Letra (px):</label>
+          <input type="range" id="input-font-size" min="20" max="60" step="2" value="38">
+          <span id="val-font-size" class="val-tag">38px</span>
+        </div>
+
+        <div class="control-row">
+          <label for="select-font-weight">Grosor de Letra:</label>
+          <select id="select-font-weight">
+            <option value="400">Normal</option>
+            <option value="700">Bold</option>
+            <option value="900" selected>Extra Bold</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- 4. Rango de Tiempo (MM:SS) -->
+      <section class="panel-section">
+        <h3>4. Rango de Tiempo (MM:SS)</h3>
+        
+        <div class="timer-display">
+          <span id="timer-text">00:00.0</span>
+        </div>
+
+        <div class="time-range-group">
+          <div class="time-input-box">
+            <label for="input-time-start">Inicio:</label>
+            <div class="stepper-wrapper">
+              <input type="text" id="input-time-start" placeholder="00:00" value="00:00">
+              <div class="stepper-btn-group">
+                <button class="btn-step" id="btn-start-up">▲</button>
+                <button class="btn-step" id="btn-start-down">▼</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="time-input-box">
+            <label for="input-time-end">Fin:</label>
+            <div class="stepper-wrapper">
+              <input type="text" id="input-time-end" placeholder="01:30" value="00:30">
+              <div class="stepper-btn-group">
+                <button class="btn-step" id="btn-end-up">▲</button>
+                <button class="btn-step" id="btn-end-down">▼</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="preset-durations">
+          <button class="btn-preset" data-seconds="30">+30s</button>
+          <button class="btn-preset" data-seconds="60">+1m</button>
+          <button class="btn-preset" data-seconds="90">+1:30m</button>
+          <button class="btn-preset" data-seconds="120">+2m</button>
+        </div>
+
+        <div class="time-action-buttons">
+          <button id="btn-sync-time" class="btn-sync">Ir a Tiempo</button>
+          <button id="btn-reset-time" class="btn-reset-range">↺ Rango</button>
+        </div>
+      </section>
+
+      <!-- 5. Selector de Versos -->
+      <section class="panel-section full-lyrics-section">
+        <h3>5. Versos de la Canción</h3>
+        <p class="subtitle">Haz clic en una línea para seleccionar manualmente:</p>
+        
+        <div class="lyrics-selector-list" id="lyrics-selector-list">
+          <div class="selector-placeholder">Cargando lista...</div>
+        </div>
+      </section>
+
+      <!-- 6. Controles de Estado y Grabación HD -->
+      <section class="panel-section">
+        <h3>6. Exportar Video HD</h3>
+        <button id="btn-record-video" class="btn-record">🔴 Grabar Canvas HD (1080x1920)</button>
+        
+        <div class="playback-controls" style="margin-top: 8px;">
+          <button id="btn-play" class="btn-status paused">PAUSED</button>
+          <button id="btn-restart">↺ Reiniciar</button>
+        </div>
+      </section>
+
+    </aside>
+
+    <!-- ÁREA DE PREVIEW / CANVAS 1080x1920 -->
+    <main class="preview-stage">
+      <div class="tiktok-canvas" id="tiktok-canvas">
+
+        <div id="quote-header" class="quote-header-box">
+          <span id="quote-text-prefix">Y como dijo </span>
+          <span id="quote-text-artist" class="highlight">Enjambre:</span>
+        </div>
+        
+        <div class="spotify-card" id="spotify-card">
+          <div class="card-blur-bg" id="card-blur-bg"></div>
+          <div class="card-color-overlay" id="card-color-overlay"></div>
+
+          <div class="card-content">
+            <div class="card-header">
+              <img id="album-art" src="" alt="Cover">
+              <div class="song-info">
+                <h3 id="song-title">Canción</h3>
+                <p id="song-artist">Artista</p>
+              </div>
+            </div>
+
+            <div class="lyrics-roulette">
+              <div id="line-prev" class="lyric-slot prev"></div>
+              <div id="line-current" class="lyric-slot current">Cargando letra...</div>
+              <div id="line-next" class="lyric-slot next"></div>
+            </div>
+
+            <div class="card-footer">
+              <span class="snoosic-logo">Snoosic</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
