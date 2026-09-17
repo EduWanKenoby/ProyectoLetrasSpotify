@@ -85,25 +85,6 @@
         </div>
       </section>
 
-      <!-- SECCIÓN TRADUCCIÓN (SOLO APARECE SI NO ES ESPAÑOL) -->
-      <section id="panel-translation" class="panel-section hidden">
-        <div class="control-row">
-          <h3>Traducción al Español</h3>
-          <input type="checkbox" id="check-enable-translation" checked style="width:18px; height:18px; cursor:pointer;">
-        </div>
-        
-        <div class="control-row">
-          <label for="input-subtext-color">Color Texto Original:</label>
-          <input type="color" id="input-subtext-color" value="#94a3b8">
-        </div>
-
-        <div class="control-row">
-          <label for="input-subtext-font-size">Tamaño Texto Original (px):</label>
-          <input type="range" id="input-subtext-font-size" min="14" max="40" step="2" value="22">
-          <span id="val-subtext-font-size" class="val-tag">22px</span>
-        </div>
-      </section>
-
       <!-- 2. Posición y Canvas -->
       <section class="panel-section">
         <h3>2. Posición y Canvas (1080x1920)</h3>
@@ -211,6 +192,7 @@
           </div>
         </div>
 
+        <!-- Botones Preset de Duración -->
         <div class="preset-durations">
           <button class="btn-preset" data-seconds="30">+30s</button>
           <button class="btn-preset" data-seconds="60">+1m</button>
@@ -251,6 +233,7 @@
     <main class="preview-stage">
       <div class="tiktok-canvas" id="tiktok-canvas">
 
+        <!-- ELEMENTO FLOTANTE DE TEXTO SUPERIOR -->
         <div id="quote-header" class="quote-header-box">
           <span id="quote-text-prefix">Y como dijo </span>
           <span id="quote-text-artist" class="highlight">Enjambre:</span>
@@ -270,9 +253,9 @@
             </div>
 
             <div class="lyrics-roulette">
-              <div id="line-prev" class="lyric-slot prev"></div>
-              <div id="line-current" class="lyric-slot current">Cargando letra...</div>
-              <div id="line-next" class="lyric-slot next"></div>
+              <p id="line-prev" class="lyric-slot prev"></p>
+              <p id="line-current" class="lyric-slot current">Cargando letra...</p>
+              <p id="line-next" class="lyric-slot next"></p>
             </div>
 
             <div class="card-footer">

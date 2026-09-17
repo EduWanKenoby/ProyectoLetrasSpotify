@@ -505,6 +505,7 @@ button {
   box-shadow: 0 0 80px rgba(0, 0, 0, 0.9);
 }
 
+/* ESTILO DEL TEXTO SUPERIOR CON ALTE HAAS GROTESK BOLD */
 .quote-header-box {
   position: absolute;
   z-index: 10;
@@ -594,30 +595,17 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 16px;
+  gap: 20px;
   flex: 1;
   margin: 20px 0;
 }
 
 .lyric-slot {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.lyric-slot .main-text {
   font-size: 2.3rem;
   font-weight: 900;
   color: #ffffff;
-  line-height: 1.2;
-}
-
-.lyric-slot .sub-text {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #94a3b8;
-  line-height: 1.2;
+  line-height: 1.25;
+  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .lyric-slot.prev,
