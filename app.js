@@ -349,7 +349,6 @@ function renderizarSelectorLyrics() {
     div.innerText = (isForeignLanguage && checkEnableTranslation.checked) ? item.translatedText : item.text;
     div.title = "Doble clic para editar la traducción de este verso";
 
-    // Permite ajustar manualmente la traducción si deseas afinar una frase
     div.addEventListener('dblclick', () => {
       if (!isForeignLanguage) return;
       const nuevoTexto = prompt("Editar traducción de este verso:", item.translatedText);
@@ -627,24 +626,44 @@ function dibujarFrameHD() {
   const footerFontSize = 24;
   const footerBaselineY = cardY + cardH - padding;
 
-  // ANIMACIÓN 3D BILINGÜE
+  // MOTOR DE TEXTO Y WRAPPING DENTRO DE LA TARJETA
   const mainColor = inputTextColor.value || "#ffffff";
-  const subColor = inputSubtextColor.value || "#94a3b8";
+  const subColor = inputSubtextColor.value || "#b3b3b3";
   const fontSizeMain = parseInt(inputFontSize.value, 10) || 38;
   const fontSizeSub = parseInt(inputSubtextFontSize.value, 10) || 22;
   const fontWeight = selectFontWeight.value || "900";
+  const maxTextWidth = cardW - (padding * 2);
   const centerX = cardX + padding;
+
+  function obtenerLineasWrapped(texto, fontCss, maxWidth) {
+    if (!texto) return [];
+    ctx.font = fontCss;
+    const palabras = texto.split(/\s+/).filter(Boolean);
+    const lineas = [];
+    let actual = '';
+    palabras.forEach((palabra) => {
+      const prueba = actual ? actual + ' ' + palabra : palabra;
+      if (actual && ctx.measureText(prueba).width > maxWidth) {
+        lineas.push(actual);
+        actual = palabra;
+      } else {
+        actual = prueba;
+      }
+    });
+    if (actual) lineas.push(actual);
+    return lineas;
+  }
 
   const progresoLineal = Math.min(1, Math.max(0, (performance.now() - lastLineChangeRealTime) / LYRIC_ANIM_DURATION_MS));
   const p = 1 - Math.pow(1 - progresoLineal, 3);
 
-  const topY = thumbY + thumbSize + 45;        
-  const centerY = topY + fontSizeMain + 45;     
-  const bottomY = centerY + fontSizeMain + 45;  
+  const topY = thumbY + thumbSize + 30;        
+  const centerY = topY + 110;     
+  const bottomY = centerY + 110;  
 
-  const statePrev = { y: topY - (p * 20), scale: 0.8 - (p * 0.1), alpha: 0.35 * (1 - p) };
-  const stateCurrent = { y: centerY - (p * (centerY - topY)), scale: 1.0 - (p * 0.2), alpha: 1.0 - (p * 0.65) };
-  const stateNext = { y: bottomY - (p * (bottomY - centerY)), scale: 0.8 + (p * 0.2), alpha: 0.35 + (p * 0.65) };
+  const statePrev = { y: topY - (p * 20), scale: 0.85 - (p * 0.1), alpha: 0.35 * (1 - p) };
+  const stateCurrent = { y: centerY - (p * (centerY - topY)), scale: 1.0 - (p * 0.15), alpha: 1.0 - (p * 0.65) };
+  const stateNext = { y: bottomY - (p * (bottomY - centerY)), scale: 0.85 + (p * 0.15), alpha: 0.35 + (p * 0.65) };
 
   function renderizarParBilingue(itemData, x, y, scale, alpha) {
     if (!itemData) return;
@@ -657,19 +676,37 @@ function dibujarFrameHD() {
     ctx.translate(x, y);
     ctx.scale(scale, scale);
 
-    // Texto Principal Traducido
+    let currentCursorY = 0;
+
+    // 1. TEXTO PRINCIPAL CON SALTO DE LÍNEA
+    const fontMainCss = `${fontWeight} ${fontSizeMain}px 'Inter', sans-serif`;
+    const lineasMain = obtenerLineasWrapped(mainStr, fontMainCss, maxTextWidth / scale);
+    
     ctx.fillStyle = mainColor;
-    ctx.font = `${fontWeight} ${fontSizeMain}px 'Inter', sans-serif`;
+    ctx.font = fontMainCss;
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    ctx.fillText(mainStr, 0, 0);
 
-    // Texto Secundario Original
+    lineasMain.forEach((linea) => {
+      ctx.fillText(linea, 0, currentCursorY);
+      currentCursorY += fontSizeMain * 1.2;
+    });
+
+    // 2. TEXTO SECUNDARIO ORIGINAL CON SALTO DE LÍNEA
     if (subStr) {
+      currentCursorY += 4;
+      const fontSubCss = `600 ${fontSizeSub}px 'Inter', sans-serif`;
+      const lineasSub = obtenerLineasWrapped(subStr, fontSubCss, maxTextWidth / scale);
+
       ctx.fillStyle = subColor;
-      ctx.font = `600 ${fontSizeSub}px 'Inter', sans-serif`;
-      ctx.fillText(subStr, 0, fontSizeMain * 1.15);
+      ctx.font = fontSubCss;
+
+      lineasSub.forEach((linea) => {
+        ctx.fillText(linea, 0, currentCursorY);
+        currentCursorY += fontSizeSub * 1.2;
+      });
     }
+
     ctx.restore();
   }
 
@@ -677,6 +714,7 @@ function dibujarFrameHD() {
   renderizarParBilingue(syncedLyrics[activeIndex], centerX, stateCurrent.y, stateCurrent.scale, stateCurrent.alpha);
   renderizarParBilingue(syncedLyrics[activeIndex + 1], centerX, stateNext.y, stateNext.scale, stateNext.alpha);
 
+  // Watermark Snoosic
   ctx.globalAlpha = 0.85;
   ctx.fillStyle = "#ffffff";
   ctx.font = `900 ${footerFontSize}px 'Inter', sans-serif`;
